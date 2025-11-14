@@ -10,9 +10,20 @@ namespace Future.UX.SourceGenerators.TEST
         private string? __phone;
         private string? __address;
 
-        private Task __Play() {
-            return null;
+        private void __Play() {
+            throw new Exception("TEST");
         }
+        private bool __Play_Can() => true;
+
+        partial void OnFirstNameChanging(string oldValue, string newValue, ref bool cancel)
+        {
+            cancel = false;
+        }
+        partial void OnFirstNameChanged(string oldValue, string newValue)
+        {
+            Console.WriteLine($"FirstName changed from '{oldValue}' to '{newValue}'");
+        }
+
         // Computed property (depends on field-backed properties)
         public string Fullname => $"{Title} {FirstName} {LastName} [{Email}] [{Phone}] {Environment.NewLine}{Address}";
 

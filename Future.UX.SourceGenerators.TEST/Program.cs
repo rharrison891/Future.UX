@@ -1,5 +1,6 @@
 ﻿using System;
 using Future.UX.SourceGenerators.TEST;
+using Future.UX.MVVM;
 
 Person p = new();
 p.PropertyChanged += (s, e) =>
@@ -15,7 +16,7 @@ p.Email = "john.doe@example.com";
 p.Phone = "+44 1234 567890";
 p.Address = "221B Baker Street, London";
 
-p.PlayCommand?.Execute("");
+if(p.PlayCommand.CanExecute()) (p.PlayCommand)?.Execute();
 
 // Access Fullname (computed property)
 Console.WriteLine($"Fullname: {p.Fullname}");

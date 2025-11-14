@@ -21,9 +21,9 @@ namespace Future.UX.MVVM
 
         public event EventHandler? CanExecuteChanged;
 
-        public bool CanExecute(object? parameter) => !_isExecuting && (_canExecute?.Invoke() ?? true);
+        public bool CanExecute(object? parameter = null) => !_isExecuting && (_canExecute?.Invoke() ?? true);
 
-        public async void Execute(object? parameter)
+        public async void Execute(object? parameter = null)
         {
             if (!CanExecute(parameter)) return;
 

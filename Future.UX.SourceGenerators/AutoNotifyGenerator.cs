@@ -76,6 +76,38 @@ namespace Future.UX.SourceGenerators
                     var computedDependentsMap = BuildComputedDependencyMap(model, typeSymbol, computedProps);
                     var sb = new StringBuilder();
 
+                    // map of generated properties -> type for partial method generation
+                    var fieldMap = group.ToDictionary(
+                        f => char.ToUpper(f.FieldName[2]) + f.FieldName.Substring(3),
+                        f => f.TypeName,
+                        StringComparer.Ordinal);
+
+                    var generatedProperties = new HashSet<string>(StringComparer.Ordinal);
+
+                    // --- Detect commands and can-methods first (so properties can notify commands) ---
+                    var commandMethods = classSyntax.Members
+                        .OfType<MethodDeclarationSyntax>()
+                        .Where(m =>
+                            m.Identifier.Text.StartsWith("__") &&
+                            !m.Identifier.Text.EndsWith("_Can", StringComparison.OrdinalIgnoreCase) &&
+                            m.Modifiers.Any(md => md.IsKind(SyntaxKind.PrivateKeyword)))
+                        .ToList();
+
+                    var canMethods = classSyntax.Members
+                        .OfType<MethodDeclarationSyntax>()
+                        .Where(m =>
+                            m.Identifier.Text.StartsWith("__") &&
+                            m.Identifier.Text.EndsWith("_Can", StringComparison.OrdinalIgnoreCase) &&
+                            m.Modifiers.Any(md => md.IsKind(SyntaxKind.PrivateKeyword)) &&
+                            (model != null
+                                ? (model.GetDeclaredSymbol(m)?.ReturnType.SpecialType == SpecialType.System_Boolean)
+                                : (string.Equals(m.ReturnType?.ToString(), "bool", StringComparison.OrdinalIgnoreCase)
+                                   || m.ReturnType?.ToString()?.EndsWith(".Boolean", StringComparison.OrdinalIgnoreCase) == true)))
+                        .ToList();
+
+                    // collect generated command metadata so property setters can call RaiseCanExecuteChanged
+                    var generatedCommands = new List<(string BackingField, bool HasCan)>();
+
                     // --- Field-backed properties ---
                     foreach (var field in group)
                     {
@@ -87,95 +119,127 @@ namespace Future.UX.SourceGenerators
                             ? deps.OrderBy(x => x).ToList()
                             : new List<string>();
 
+                        generatedProperties.Add(propName);
+
+                        // equality-check before calling change hooks/notifications
                         sb.AppendLine($@"
         public {field.TypeName} {propName}
         {{
             get => {field.FieldName};
             set
             {{
-                if ({field.FieldName} != value)
-                {{
-                    {field.FieldName} = value;
-                    OnPropertyChanged(nameof({propName}));");
-                        foreach (var dep in dependents)
-                            sb.AppendLine($"                    OnPropertyChanged(nameof({dep}));");
+                var oldValue = {field.FieldName};
+                var newValue = value;
+                if (System.Collections.Generic.EqualityComparer<{field.TypeName}>.Default.Equals(oldValue, newValue))
+                    return;
 
-                        sb.AppendLine($@"                }}
-            }}
-        }}");
+                bool cancel = false;
+                On{propName}Changing(oldValue, newValue, ref cancel);
+                if (cancel) return;
+
+                {field.FieldName} = newValue;
+
+                On{propName}Changed(oldValue, newValue);
+
+                OnPropertyChanged(nameof({propName}));");
+                        foreach (var dep in dependents)
+                            sb.AppendLine($"                OnPropertyChanged(nameof({dep}));");
+
+                        // call RaiseCanExecuteChanged on any generated commands that have a can-method
+                        foreach (var cmd in generatedCommands)
+                        {
+                            if (cmd.HasCan)
+                                sb.AppendLine($"                {cmd.BackingField}?.RaiseCanExecuteChanged();");
+                        }
+
+                        sb.AppendLine("            }\n        }");
                     }
 
-                    // --- Commands from private __ methods ---
-                    var methodDecls = classSyntax.Members
-                        .OfType<MethodDeclarationSyntax>()
-                        .Where(m => m.Identifier.Text.StartsWith("__") &&
-                                    m.Modifiers.Any(md => md.IsKind(SyntaxKind.PrivateKeyword)))
-                        .ToList();
-
-                    foreach (var method in methodDecls)
+                    // --- Commands from private __ methods (two-pass) ---
+                    foreach (var method in commandMethods)
                     {
-                        string methodName = method.Identifier.Text;           // e.g. "__Play"
-                        string commandBase = methodName.Substring(2);         // e.g. "Play"
-                        string commandName = commandBase + "Command";         // e.g. "PlayCommand"
-                        string backingField = "_" + char.ToLower(commandBase[0]) + commandBase.Substring(1) + "Command"; // _playCommand
+                        string methodName = method.Identifier.Text;           // "__Play"
+                        string commandBase = methodName.Substring(2);         // "Play"
+                        string commandName = commandBase + "Command";         // "PlayCommand"
+                        string backingField = "_" + char.ToLower(commandBase[0]) + commandBase.Substring(1) + "Command";
 
                         bool alreadyExists = typeSymbol?.GetMembers(commandName).Any() ?? false;
                         if (alreadyExists) continue;
 
-                        // Is async? use semantic info if available
-                        bool isAsync = false;
-                        if (method.Modifiers.Any(md => md.IsKind(SyntaxKind.AsyncKeyword)))
-                            isAsync = true;
-                        else if (model is not null)
+                        // Detect async command
+                        bool isAsync = method.Modifiers.Any(md => md.IsKind(SyntaxKind.AsyncKeyword));
+                        if (!isAsync && model != null)
                         {
-                            // try to resolve return type symbol
                             var returnTypeSymbol = model.GetTypeInfo(method.ReturnType).Type;
-                            if (returnTypeSymbol != null && returnTypeSymbol.ToDisplayString().Contains("Task", StringComparison.Ordinal))
+                            if (returnTypeSymbol != null &&
+                                returnTypeSymbol.ToDisplayString().Contains("Task", StringComparison.Ordinal))
                                 isAsync = true;
-                        }
-                        else
-                        {
-                            // fallback textual check
-                            isAsync = method.ReturnType.ToString().Contains("Task", StringComparison.Ordinal);
                         }
 
                         var parameters = method.ParameterList.Parameters;
-                        string commandType;
-                        string commandTypeWithGenerics = "";
-                        string factoryExpr;
-
-                        if (parameters.Count == 0)
+                        string? paramTypeName = null;
+                        if (parameters.Count == 1)
                         {
-                            commandType = isAsync ? "AsyncRelayCommand" : "RelayCommand";
-                            factoryExpr = $"new {commandType}({methodName})";
-                        }
-                        else if (parameters.Count == 1)
-                        {
-                            // resolve parameter type nicely via semantic model if possible
                             ITypeSymbol? paramTypeSymbol = null;
-                            if (model is not null)
-                            {
+                            if (model != null)
                                 paramTypeSymbol = model.GetTypeInfo(parameters[0].Type!).Type;
-                            }
 
-                            string paramTypeName = paramTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                            paramTypeName = paramTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
                                 .Replace("global::", string.Empty)
                                 ?? parameters[0].Type?.ToString() ?? "object";
-
-                            commandType = isAsync ? $"AsyncRelayCommand<{paramTypeName}>" : $"RelayCommand<{paramTypeName}>";
-                            factoryExpr = $"new {commandType}({methodName})";
-                            commandTypeWithGenerics = commandType;
                         }
-                        else
+                        else if (parameters.Count > 1)
                         {
-                            // skip multi-parameter methods for now
+                            // skip multi-parameter methods
                             continue;
                         }
 
-                        // generate backing field + lazy property. Backing field must be a field of type ICommand?:
+                        // Find matching CanExecute method (case-insensitive)
+                        MethodDeclarationSyntax? canMethod = canMethods
+                            .FirstOrDefault(m =>
+                                string.Equals(m.Identifier.Text, $"__{commandBase}_Can", StringComparison.OrdinalIgnoreCase) &&
+                                m.ParameterList.Parameters.Count == parameters.Count);
+
+                        bool hasCan = canMethod != null;
+                        generatedCommands.Add((backingField, hasCan));
+
+                        // Determine command type
+                        string commandType = parameters.Count == 0
+                            ? (isAsync ? "AsyncRelayCommand" : "RelayCommand")
+                            : (isAsync ? $"AsyncRelayCommand<{paramTypeName}>" : $"RelayCommand<{paramTypeName}>");
+
+                        // Factory expression: prefer passing method groups (strongly-typed) rather than object lambdas
+                        string factoryExpr;
+                        if (hasCan)
+                        {
+                            // pass method groups; method signatures should match delegate shapes
+                            factoryExpr = parameters.Count == 0
+                                ? $"new {commandType}({methodName}, {canMethod!.Identifier.Text})"
+                                : $"new {commandType}({methodName}, {canMethod!.Identifier.Text})";
+                        }
+                        else
+                        {
+                            factoryExpr = parameters.Count == 0
+                                ? $"new {commandType}({methodName})"
+                                : $"new {commandType}({methodName})";
+                        }
+
+                        // Generate backing field + concrete property (kept concrete as requested)
                         sb.AppendLine($@"
-        private System.Windows.Input.ICommand? {backingField};
-        public System.Windows.Input.ICommand {commandName} => {backingField} ??= {factoryExpr};");
+        private {commandType}? {backingField};
+        public {commandType} {commandName} => {backingField} ??= {factoryExpr};");
+                    }
+
+                    // --- Emit partial methods ---
+                    if (generatedProperties.Count > 0)
+                    {
+                        sb.AppendLine();
+                        foreach (var gp in generatedProperties.OrderBy(x => x))
+                        {
+                            var typeName = fieldMap[gp];
+                            sb.AppendLine($"        partial void On{gp}Changing({typeName} oldValue, {typeName} newValue, ref bool cancel);");
+                            sb.AppendLine($"        partial void On{gp}Changed({typeName} oldValue, {typeName} newValue);");
+                        }
                     }
 
                     if (sb.Length == 0) continue;
@@ -196,7 +260,6 @@ using System.Windows.Input;
 using Future.UX.MVVM;
 
 {nsOpen}
-    [DebuggerNonUserCode]
     public partial class {className} : INotifyPropertyChanged
     {{
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -256,7 +319,6 @@ using Future.UX.MVVM;
                 directDeps[cp.Identifier.Text] = deps;
             }
 
-            // reverse graph: dependency -> computed props that directly depend on it
             var reverse = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
             foreach (var kvp in directDeps)
             {
@@ -272,7 +334,6 @@ using Future.UX.MVVM;
                 }
             }
 
-            // compute transitive dependents
             var result = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
             var allKeys = new HashSet<string>(directDeps.Keys, StringComparer.Ordinal);
             allKeys.UnionWith(reverse.Keys);
@@ -291,12 +352,9 @@ using Future.UX.MVVM;
                     if (!seen.Add(cur)) continue;
 
                     if (!result.TryGetValue(key, out var depsForKey))
-                    {
-                        depsForKey = new HashSet<string>(StringComparer.Ordinal);
-                        result[key] = depsForKey;
-                    }
+                        result[key] = new HashSet<string>(StringComparer.Ordinal);
 
-                    depsForKey.Add(cur);
+                    result[key].Add(cur);
 
                     if (reverse.TryGetValue(cur, out var next))
                         foreach (var n in next)
