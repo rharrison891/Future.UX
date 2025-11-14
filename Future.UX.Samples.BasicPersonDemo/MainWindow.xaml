@@ -1,0 +1,54 @@
+﻿<Window x:Class="Future.UX.Samples.BasicPersonDemo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Basic Person Demo"
+        SizeToContent="WidthAndHeight"
+        Background="#202020"
+        TextElement.Foreground="White"
+        TextElement.FontSize="20"
+        DataContext="{Binding Person ,RelativeSource={RelativeSource Mode=Self}}">
+
+    <Border CornerRadius="5"
+            BorderBrush="White"
+            BorderThickness="1"
+            Margin="10">
+        <StackPanel HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+            <Border CornerRadius="5,5,0,0"
+                    Background="#80505050"
+                    Padding="10,5"
+                    Margin="0,0,0,10">
+                <TextBlock Text="{Binding FullName}" />
+            </Border>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="First Name"
+                           Padding="5"
+                           VerticalAlignment="Center" />
+                <TextBox Width="200"
+                         Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}"
+                         Background="#80505050"
+                         BorderThickness="0"
+                         Padding="5,2"
+                         Margin="5"
+                         Foreground="White" />
+                <TextBlock Text="Last Name"
+                           VerticalAlignment="Center"
+                           Padding="5" />
+                <TextBox Width="200"
+                         Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}"
+                         Background="#80505050"
+                         BorderThickness="0"
+                         Padding="5,2"
+                         Margin="5"
+                         Foreground="White" />
+            </StackPanel>
+            <Button Content="{Binding ClickCountText}"
+                    Command="{Binding ClickIncrementerCommand}"
+                    CommandParameter="1"
+                    Margin="5,20,5,5" />
+        </StackPanel>
+    </Border>
+</Window>

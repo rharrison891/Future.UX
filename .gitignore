@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Future.UX.MVVM/README.md
+/Future.UX.SourceGenerators/README.md
