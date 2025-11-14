@@ -13,10 +13,7 @@
 	</ItemGroup>
 
 	<!--<PropertyGroup>
-		--><!-- Emit generated source files to disk --><!--
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-
-		--><!-- Optional: specify a custom output folder for generated files --><!--
 		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
 	</PropertyGroup>-->
 </Project>
