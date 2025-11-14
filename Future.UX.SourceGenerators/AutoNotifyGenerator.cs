@@ -157,7 +157,7 @@ namespace Future.UX.SourceGenerators
                     foreach (var method in commandMethods)
                     {
                         string methodName = method.Identifier.Text;
-                        string commandBase = methodName.Substring(2);
+                        string commandBase = methodName.Substring(2); // Strip __ prefix
                         string commandName = commandBase + "Command";
                         string backingField = "_" + char.ToLower(commandBase[0]) + commandBase.Substring(1) + "Command";
 
@@ -175,8 +175,10 @@ namespace Future.UX.SourceGenerators
 
                         var parameters = method.ParameterList.Parameters;
                         string? paramTypeName = null;
+                        bool hasParameter = false;
                         if (parameters.Count == 1)
                         {
+                            hasParameter = true;
                             ITypeSymbol? paramTypeSymbol = null;
                             if (model != null)
                                 paramTypeSymbol = model.GetTypeInfo(parameters[0].Type!).Type;
@@ -185,32 +187,68 @@ namespace Future.UX.SourceGenerators
                                 .Replace("global::", string.Empty)
                                 ?? parameters[0].Type?.ToString() ?? "object";
                         }
-                        else if (parameters.Count > 1) continue;
+                        else if (parameters.Count > 1)
+                        {
+                            continue; // skip multi-parameter commands
+                        }
 
-                        // Matching CanExecute
-                        MethodDeclarationSyntax? canMethod = canMethods
-                            .FirstOrDefault(m =>
-                                string.Equals(m.Identifier.Text, $"__{commandBase}_Can", StringComparison.OrdinalIgnoreCase) &&
-                                m.ParameterList.Parameters.Count == parameters.Count);
-
-                        bool hasCan = canMethod != null;
-                        generatedCommands.Add((backingField, hasCan));
+                        // --- Partial methods ---
+                        if (hasParameter)
+                        {
+                            sb.AppendLine($"        partial void Can{commandBase}Execute({paramTypeName} parameter, ref bool canExecute);");
+                            sb.AppendLine($"        partial void On{commandBase}Executing({paramTypeName} parameter, ref bool cancel);");
+                            sb.AppendLine($"        partial void On{commandBase}Executed({paramTypeName} parameter);");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"        partial void Can{commandBase}Execute(ref bool canExecute);");
+                            sb.AppendLine($"        partial void On{commandBase}Executing(ref bool cancel);");
+                            sb.AppendLine($"        partial void On{commandBase}Executed();");
+                        }
 
                         // Command type
-                        string commandType = parameters.Count == 0
-                            ? (isAsync ? "AsyncRelayCommand" : "RelayCommand")
-                            : (isAsync ? $"AsyncRelayCommand<{paramTypeName}>" : $"RelayCommand<{paramTypeName}>");
+                        string commandType = hasParameter
+                            ? (isAsync ? $"AsyncRelayCommand<{paramTypeName}>" : $"RelayCommand<{paramTypeName}>")
+                            : (isAsync ? "AsyncRelayCommand" : "RelayCommand");
 
-                        // Factory expression
-                        string factoryExpr = parameters.Count == 0
-                            ? (hasCan ? $"new {commandType}({methodName}, {canMethod!.Identifier.Text})"
-                                      : $"new {commandType}({methodName})")
-                            : (hasCan ? $"new {commandType}({methodName}, {canMethod!.Identifier.Text})"
-                                      : $"new {commandType}({methodName})");
+                        // Lambda for execution
+                        string execLambda;
+                        if (hasParameter)
+                        {
+                            execLambda = $@"
+                var canExecute = true;
+                Can{commandBase}Execute(parameter, ref canExecute);
+                if (!canExecute) return;
+
+                var cancel = false;
+                On{commandBase}Executing(parameter, ref cancel);
+                if (cancel) return;
+
+                {methodName}(parameter);
+
+                On{commandBase}Executed(parameter);";
+                        }
+                        else
+                        {
+                            execLambda = $@"
+                var canExecute = true;
+                Can{commandBase}Execute(ref canExecute);
+                if (!canExecute) return;
+
+                var cancel = false;
+                On{commandBase}Executing(ref cancel);
+                if (cancel) return;
+
+                {methodName}();
+
+                On{commandBase}Executed();";
+                        }
 
                         sb.AppendLine($@"
         private {commandType}? {backingField};
-        public {commandType} {commandName} => {backingField} ??= {factoryExpr};");
+        public {commandType} {commandName} => {backingField} ??= new {commandType}(
+            parameter => {{ {execLambda} }}
+        );");
                     }
 
                     // --- Partial methods ---
