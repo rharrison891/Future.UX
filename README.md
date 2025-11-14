@@ -1,21 +1,46 @@
 # Future.UX
 
-Experimental MVVM toolkit + C#14 source generator.
+**Experimental MVVM toolkit + C#14 source generator** for ultra-lightweight, boilerplate-free MVVM in WPF.
 
-- `Future.UX.SourceGenerators` — incremental source generator: converts `__`-prefixed fields and methods into bindable properties and commands.
-- `Future.UX.MVVM` — runtime MVVM helpers (RelayCommand / AsyncRelayCommand).
-- `Future.UX.Test` — playground and samples.
+- `Future.UX.SourceGenerators` â€“ Incremental source generator: converts `__`-prefixed fields and methods into **bindable properties** and **commands** automatically.
+- `Future.UX.MVVM` â€“ Runtime MVVM helpers (`RelayCommand` / `AsyncRelayCommand`) to handle sync and async commands cleanly.
+- `Future.UX.Test` â€“ Playground & sample projects to try things out.
 
-## Quick start
+## Quick Start
 
-1. Clone
-2. Open solution in Visual Studio 2026
-3. Build & run `Future.UX.Test`
+1. Clone the repository:
+   ```bash
+   git clone <your-repo-url>
 
-## Contributing
+2. Open the solution in Visual Studio 2026.
 
-Open a PR against `dev` branch. Keep `main` protected.
 
-## License
+3. Build & run Future.UX.Test to see examples in action.
 
-MIT — see `LICENSE` file.
+
+
+Features
+
+Auto-generates properties and INotifyPropertyChanged wiring from __-prefixed fields.
+
+Auto-generates concrete RelayCommand and AsyncRelayCommand properties from private __ methods.
+
+Supports CanExecute methods for commands.
+
+Minimal boilerplate â€“ just define your fields & methods, the generator does the rest.
+
+Fully compatible with XAML bindings and CommandParameter.
+
+
+Contributing
+
+Open a PR against the dev branch.
+
+Keep main protected; we like it stable. ðŸ˜Ž
+
+
+License
+
+MIT â€“ see the LICENSE file.
+
+This one is complete and should copy all the way down. 
