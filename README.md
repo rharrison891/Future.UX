@@ -1,4 +1,4 @@
-![Release](https://img.shields.io/badge/release-v1.0.0-blue)
+![Release](https://img.shields.io/badge/release-v1.0.0.2-blue)
 # Future.UX
 
 **Experimental MVVM toolkit + C#14 source generator** for ultra-lightweight, boilerplate-free MVVM in WPF.
