@@ -1,4 +1,7 @@
 ![Release](https://img.shields.io/badge/release-v1.0.0.2-blue)
+SourceGenerator ![NuGet](https://img.shields.io/nuget/v/Future.UX.SourceGenerators)
+MVVM ![NuGet](https://img.shields.io/nuget/v/Future.UX.MVVM)
+
 # Future.UX
 
 **Experimental MVVM toolkit + C#14 source generator** for ultra-lightweight, boilerplate-free MVVM in WPF.
@@ -30,6 +33,29 @@ Supports CanExecute methods for commands.
 Minimal boilerplate – just define your fields & methods, the generator does the rest.
 
 Fully compatible with XAML bindings and CommandParameter.
+
+
+## Installation
+
+Install the packages:
+
+      Install-Package Future.UX.MVVM
+      Install-Package Future.UX.SourceGenerators
+
+
+## Example
+
+      public partial class Person
+      {
+          private string? __firstName;
+          private string? __lastName;
+          // Computed property
+          public string FullName => $"{FirstName} {LastName}";
+      }
+
+Even with just this, the generator will create the FirstName and LastName properties with INotifyPropertyChanged and also update FullName automatically when FirstName or LastName changes.
+
+No need for additional usings or attributes. Just use the __ prefix and the generator does the rest.
 
 
 ## Contributing
