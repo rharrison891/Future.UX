@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Future.UX.MVVM
 {
-    public class RelayCommand : ICommand
+    public class RelayCommand<T> : ICommand
     {
-        private readonly Action _execute;
-        private readonly Func<bool>? _canExecute;
+        private readonly Action<T>? _execute;
+        private readonly Func<T, bool>? _canExecute;
 
-        public RelayCommand(Action execute, Func<bool>? canExecute = null)
+        public RelayCommand(Action<T> execute, Func<T, bool>? canExecute = null)
         {
             _execute = execute ?? throw new ArgumentNullException(nameof(execute));
             _canExecute = canExecute;
@@ -20,9 +17,16 @@ namespace Future.UX.MVVM
 
         public event EventHandler? CanExecuteChanged;
 
-        public bool CanExecute(object? parameter=null) => _canExecute?.Invoke() ?? true;
+        public bool CanExecute(object? parameter = null)
+        {
+            if (_canExecute == null) return true;
+            return _canExecute((T)parameter!);
+        }
 
-        public void Execute(object? parameter=null) => _execute();
+        public void Execute(object? parameter = null)
+        {
+            _execute?.Invoke((T)parameter!);
+        }
 
         public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }

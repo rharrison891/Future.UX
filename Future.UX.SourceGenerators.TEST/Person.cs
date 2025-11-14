@@ -10,10 +10,10 @@ namespace Future.UX.SourceGenerators.TEST
         private string? __phone;
         private string? __address;
 
-        private void __Play() {
+        private void __Play(string x) {
             throw new Exception("TEST");
         }
-        private bool __Play_Can() => true;
+        private bool __Play_Can(string x) => true;
 
         partial void OnFirstNameChanging(string oldValue, string newValue, ref bool cancel)
         {

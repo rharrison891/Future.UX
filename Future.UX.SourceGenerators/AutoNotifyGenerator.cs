@@ -4,7 +4,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -15,6 +14,7 @@ namespace Future.UX.SourceGenerators
     {
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
+            // Detect field declarations starting with __
             var fieldDeclarations = context.SyntaxProvider
                 .CreateSyntaxProvider(
                     static (node, _) => node is FieldDeclarationSyntax f &&
@@ -76,7 +76,7 @@ namespace Future.UX.SourceGenerators
                     var computedDependentsMap = BuildComputedDependencyMap(model, typeSymbol, computedProps);
                     var sb = new StringBuilder();
 
-                    // map of generated properties -> type for partial method generation
+                    // Map of generated properties -> type
                     var fieldMap = group.ToDictionary(
                         f => char.ToUpper(f.FieldName[2]) + f.FieldName.Substring(3),
                         f => f.TypeName,
@@ -84,7 +84,7 @@ namespace Future.UX.SourceGenerators
 
                     var generatedProperties = new HashSet<string>(StringComparer.Ordinal);
 
-                    // --- Detect commands and can-methods first (so properties can notify commands) ---
+                    // --- Detect commands ---
                     var commandMethods = classSyntax.Members
                         .OfType<MethodDeclarationSyntax>()
                         .Where(m =>
@@ -105,7 +105,6 @@ namespace Future.UX.SourceGenerators
                                    || m.ReturnType?.ToString()?.EndsWith(".Boolean", StringComparison.OrdinalIgnoreCase) == true)))
                         .ToList();
 
-                    // collect generated command metadata so property setters can call RaiseCanExecuteChanged
                     var generatedCommands = new List<(string BackingField, bool HasCan)>();
 
                     // --- Field-backed properties ---
@@ -121,7 +120,6 @@ namespace Future.UX.SourceGenerators
 
                         generatedProperties.Add(propName);
 
-                        // equality-check before calling change hooks/notifications
                         sb.AppendLine($@"
         public {field.TypeName} {propName}
         {{
@@ -142,31 +140,29 @@ namespace Future.UX.SourceGenerators
                 On{propName}Changed(oldValue, newValue);
 
                 OnPropertyChanged(nameof({propName}));");
+
                         foreach (var dep in dependents)
                             sb.AppendLine($"                OnPropertyChanged(nameof({dep}));");
 
-                        // call RaiseCanExecuteChanged on any generated commands that have a can-method
+                        // Raise CanExecuteChanged for commands with CanExecute
                         foreach (var cmd in generatedCommands)
-                        {
                             if (cmd.HasCan)
                                 sb.AppendLine($"                {cmd.BackingField}?.RaiseCanExecuteChanged();");
-                        }
 
                         sb.AppendLine("            }\n        }");
                     }
 
-                    // --- Commands from private __ methods (two-pass) ---
+                    // --- Generate commands ---
                     foreach (var method in commandMethods)
                     {
-                        string methodName = method.Identifier.Text;           // "__Play"
-                        string commandBase = methodName.Substring(2);         // "Play"
-                        string commandName = commandBase + "Command";         // "PlayCommand"
+                        string methodName = method.Identifier.Text;
+                        string commandBase = methodName.Substring(2);
+                        string commandName = commandBase + "Command";
                         string backingField = "_" + char.ToLower(commandBase[0]) + commandBase.Substring(1) + "Command";
 
                         bool alreadyExists = typeSymbol?.GetMembers(commandName).Any() ?? false;
                         if (alreadyExists) continue;
 
-                        // Detect async command
                         bool isAsync = method.Modifiers.Any(md => md.IsKind(SyntaxKind.AsyncKeyword));
                         if (!isAsync && model != null)
                         {
@@ -188,13 +184,9 @@ namespace Future.UX.SourceGenerators
                                 .Replace("global::", string.Empty)
                                 ?? parameters[0].Type?.ToString() ?? "object";
                         }
-                        else if (parameters.Count > 1)
-                        {
-                            // skip multi-parameter methods
-                            continue;
-                        }
+                        else if (parameters.Count > 1) continue;
 
-                        // Find matching CanExecute method (case-insensitive)
+                        // Matching CanExecute
                         MethodDeclarationSyntax? canMethod = canMethods
                             .FirstOrDefault(m =>
                                 string.Equals(m.Identifier.Text, $"__{commandBase}_Can", StringComparison.OrdinalIgnoreCase) &&
@@ -203,34 +195,24 @@ namespace Future.UX.SourceGenerators
                         bool hasCan = canMethod != null;
                         generatedCommands.Add((backingField, hasCan));
 
-                        // Determine command type
+                        // Command type
                         string commandType = parameters.Count == 0
                             ? (isAsync ? "AsyncRelayCommand" : "RelayCommand")
                             : (isAsync ? $"AsyncRelayCommand<{paramTypeName}>" : $"RelayCommand<{paramTypeName}>");
 
-                        // Factory expression: prefer passing method groups (strongly-typed) rather than object lambdas
-                        string factoryExpr;
-                        if (hasCan)
-                        {
-                            // pass method groups; method signatures should match delegate shapes
-                            factoryExpr = parameters.Count == 0
-                                ? $"new {commandType}({methodName}, {canMethod!.Identifier.Text})"
-                                : $"new {commandType}({methodName}, {canMethod!.Identifier.Text})";
-                        }
-                        else
-                        {
-                            factoryExpr = parameters.Count == 0
-                                ? $"new {commandType}({methodName})"
-                                : $"new {commandType}({methodName})";
-                        }
+                        // Factory expression
+                        string factoryExpr = parameters.Count == 0
+                            ? (hasCan ? $"new {commandType}({methodName}, {canMethod!.Identifier.Text})"
+                                      : $"new {commandType}({methodName})")
+                            : (hasCan ? $"new {commandType}({methodName}, {canMethod!.Identifier.Text})"
+                                      : $"new {commandType}({methodName})");
 
-                        // Generate backing field + concrete property (kept concrete as requested)
                         sb.AppendLine($@"
         private {commandType}? {backingField};
         public {commandType} {commandName} => {backingField} ??= {factoryExpr};");
                     }
 
-                    // --- Emit partial methods ---
+                    // --- Partial methods ---
                     if (generatedProperties.Count > 0)
                     {
                         sb.AppendLine();
@@ -244,9 +226,8 @@ namespace Future.UX.SourceGenerators
 
                     if (sb.Length == 0) continue;
 
-                    var hasNamespace = !string.IsNullOrEmpty(namespaceName);
-                    var nsOpen = hasNamespace ? $"namespace {namespaceName}\n{{" : string.Empty;
-                    var nsClose = hasNamespace ? "}" : string.Empty;
+                    var nsOpen = !string.IsNullOrEmpty(namespaceName) ? $"namespace {namespaceName}\n{{" : string.Empty;
+                    var nsClose = !string.IsNullOrEmpty(namespaceName) ? "}" : string.Empty;
 
                     var src = $@"// <auto-generated>
 //  ⚙️ This file was generated by Future.UX.SourceGenerators
@@ -255,7 +236,6 @@ namespace Future.UX.SourceGenerators
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows.Input;
 using Future.UX.MVVM;
 
@@ -312,8 +292,7 @@ using Future.UX.MVVM;
                 else
                 {
                     var tokens = cp.DescendantTokens().Where(t => t.IsKind(SyntaxKind.IdentifierToken));
-                    foreach (var tk in tokens)
-                        deps.Add(tk.ValueText);
+                    foreach (var tk in tokens) deps.Add(tk.ValueText);
                 }
 
                 directDeps[cp.Identifier.Text] = deps;
@@ -326,10 +305,7 @@ using Future.UX.MVVM;
                 foreach (var dep in kvp.Value)
                 {
                     if (!reverse.TryGetValue(dep, out var set))
-                    {
-                        set = new HashSet<string>(StringComparer.Ordinal);
-                        reverse[dep] = set;
-                    }
+                        reverse[dep] = set = new HashSet<string>(StringComparer.Ordinal);
                     set.Add(computedName);
                 }
             }
@@ -342,7 +318,6 @@ using Future.UX.MVVM;
             {
                 var seen = new HashSet<string>(StringComparer.Ordinal);
                 var q = new Queue<string>();
-
                 if (reverse.TryGetValue(key, out var starters))
                     foreach (var s in starters) q.Enqueue(s);
 

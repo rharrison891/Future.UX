@@ -16,7 +16,7 @@ p.Email = "john.doe@example.com";
 p.Phone = "+44 1234 567890";
 p.Address = "221B Baker Street, London";
 
-if(p.PlayCommand.CanExecute()) (p.PlayCommand)?.Execute();
+if(p.PlayCommand.CanExecute("HI")) (p.PlayCommand)?.Execute("HI");
 
 // Access Fullname (computed property)
 Console.WriteLine($"Fullname: {p.Fullname}");
