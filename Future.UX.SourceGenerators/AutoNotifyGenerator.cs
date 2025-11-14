@@ -65,23 +65,23 @@ namespace Future.UX.SourceGenerators
                     catch { }
 
                     var propertyDecls = classSyntax.Members.OfType<PropertyDeclarationSyntax>().ToList();
-                    var computedProps = propertyDecls
-                        .Where(p =>
-                            p.ExpressionBody != null ||
-                            (p.AccessorList?.Accessors.Any(a =>
-                                a.Kind() == SyntaxKind.GetAccessorDeclaration &&
-                                (a.Body != null || a.ExpressionBody != null)) ?? false))
-                        .ToList();
 
-                    var computedDependentsMap = BuildComputedDependencyMap(model, typeSymbol, computedProps);
-                    var sb = new StringBuilder();
-
-                    // Map of generated properties -> type
+                    // Map of field-backed properties -> type
                     var fieldMap = group.ToDictionary(
                         f => char.ToUpper(f.FieldName[2]) + f.FieldName.Substring(3),
                         f => f.TypeName,
                         StringComparer.Ordinal);
 
+                    // Detect computed properties
+                    var computedProps = propertyDecls
+                        .Where(p =>
+                            !fieldMap.ContainsKey(p.Identifier.Text)) // Not field-backed
+                        .ToList();
+
+                    // Build dependency map from computed properties to fields
+                    var computedDependentsMap = BuildComputedDependencyMap(model, typeSymbol, computedProps, fieldMap);
+
+                    var sb = new StringBuilder();
                     var generatedProperties = new HashSet<string>(StringComparer.Ordinal);
 
                     // --- Detect commands ---
@@ -141,6 +141,7 @@ namespace Future.UX.SourceGenerators
 
                 OnPropertyChanged(nameof({propName}));");
 
+                        // Raise OnPropertyChanged for computed properties depending on this field
                         foreach (var dep in dependents)
                             sb.AppendLine($"                OnPropertyChanged(nameof({dep}));");
 
@@ -259,67 +260,68 @@ using Future.UX.MVVM;
         private static Dictionary<string, HashSet<string>> BuildComputedDependencyMap(
             SemanticModel? model,
             INamedTypeSymbol? typeSymbol,
-            List<PropertyDeclarationSyntax> computedProps)
+            List<PropertyDeclarationSyntax> computedProps,
+            Dictionary<string, string> fieldMap)
         {
-            var directDeps = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+            // Reverse map: field-backed property -> all computed properties that depend on it
+            var reverse = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
 
             foreach (var cp in computedProps)
             {
                 var deps = new HashSet<string>(StringComparer.Ordinal);
 
-                if (model != null && typeSymbol != null)
+                // Walk ExpressionBody
+                if (cp.ExpressionBody != null)
                 {
-                    var nodes = cp.DescendantNodes();
-                    foreach (var id in nodes.OfType<IdentifierNameSyntax>())
+                    foreach (var id in cp.ExpressionBody.Expression.DescendantNodesAndSelf().OfType<IdentifierNameSyntax>())
                     {
-                        var sym = model.GetSymbolInfo(id).Symbol;
-                        if (sym is IPropertySymbol psym &&
-                            SymbolEqualityComparer.Default.Equals(psym.ContainingType, typeSymbol))
-                            deps.Add(psym.Name);
+                        if (fieldMap.ContainsKey(id.Identifier.Text))
+                            deps.Add(id.Identifier.Text);
                     }
+                }
 
-                    foreach (var ma in nodes.OfType<MemberAccessExpressionSyntax>())
+                // Walk getter body
+                if (cp.AccessorList != null)
+                {
+                    foreach (var getAccessor in cp.AccessorList.Accessors.Where(a => a.Kind() == SyntaxKind.GetAccessorDeclaration))
                     {
-                        if (ma.Name is IdentifierNameSyntax nameNode)
+                        if (getAccessor.Body != null)
                         {
-                            var sym = model.GetSymbolInfo(nameNode).Symbol;
-                            if (sym is IPropertySymbol psym &&
-                                SymbolEqualityComparer.Default.Equals(psym.ContainingType, typeSymbol))
-                                deps.Add(psym.Name);
+                            foreach (var id in getAccessor.Body.DescendantNodes().OfType<IdentifierNameSyntax>())
+                            {
+                                if (fieldMap.ContainsKey(id.Identifier.Text))
+                                    deps.Add(id.Identifier.Text);
+                            }
+                        }
+
+                        if (getAccessor.ExpressionBody != null)
+                        {
+                            foreach (var id in getAccessor.ExpressionBody.Expression.DescendantNodesAndSelf().OfType<IdentifierNameSyntax>())
+                            {
+                                if (fieldMap.ContainsKey(id.Identifier.Text))
+                                    deps.Add(id.Identifier.Text);
+                            }
                         }
                     }
                 }
-                else
-                {
-                    var tokens = cp.DescendantTokens().Where(t => t.IsKind(SyntaxKind.IdentifierToken));
-                    foreach (var tk in tokens) deps.Add(tk.ValueText);
-                }
 
-                directDeps[cp.Identifier.Text] = deps;
-            }
-
-            var reverse = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
-            foreach (var kvp in directDeps)
-            {
-                var computedName = kvp.Key;
-                foreach (var dep in kvp.Value)
+                // Register reverse dependencies
+                foreach (var dep in deps)
                 {
                     if (!reverse.TryGetValue(dep, out var set))
                         reverse[dep] = set = new HashSet<string>(StringComparer.Ordinal);
-                    set.Add(computedName);
+                    set.Add(cp.Identifier.Text);
                 }
             }
 
+            // Expand recursively
             var result = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
-            var allKeys = new HashSet<string>(directDeps.Keys, StringComparer.Ordinal);
-            allKeys.UnionWith(reverse.Keys);
-
-            foreach (var key in allKeys)
+            foreach (var key in fieldMap.Keys)
             {
+                if (!reverse.TryGetValue(key, out var starters)) continue;
+
                 var seen = new HashSet<string>(StringComparer.Ordinal);
-                var q = new Queue<string>();
-                if (reverse.TryGetValue(key, out var starters))
-                    foreach (var s in starters) q.Enqueue(s);
+                var q = new Queue<string>(starters);
 
                 while (q.Count > 0)
                 {
