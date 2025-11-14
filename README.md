@@ -1,6 +1,6 @@
 ![Release](https://img.shields.io/badge/release-v1.0.0.2-blue)
-SourceGenerator ![NuGet](https://img.shields.io/nuget/v/Future.UX.SourceGenerators)
-MVVM ![NuGet](https://img.shields.io/nuget/v/Future.UX.MVVM)
+![NuGet](https://img.shields.io/nuget/v/Future.UX.SourceGenerators)
+![NuGet](https://img.shields.io/nuget/v/Future.UX.MVVM)
 
 # Future.UX
 
@@ -37,9 +37,12 @@ Fully compatible with XAML bindings and CommandParameter.
 
 ## Installation
 
-Install the packages:
+Install the MVVM package:
 
       Install-Package Future.UX.MVVM
+
+For full automatic property generation, also include the source generator:
+
       Install-Package Future.UX.SourceGenerators
 
 
