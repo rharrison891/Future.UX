@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Future.UX.MVVM/Future.UX.MVVM.csproj" />
+  <Project Path="Future.UX.SourceGenerators.TEST/Future.UX.SourceGenerators.TEST.csproj" />
+  <Project Path="Future.UX.SourceGenerators/Future.UX.SourceGenerators.csproj" />
+</Solution>

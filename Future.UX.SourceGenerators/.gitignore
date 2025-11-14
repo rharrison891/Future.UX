@@ -1,0 +1,54 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+bin/
+obj/
+**/bin/
+**/obj/
+
+# VS Code
+.vscode/
+
+# Rider
+.idea/
+
+# NuGet
+*.nupkg
+packages/
+
+# Generated files emitted for Intellisense
+GeneratedFiles/
+*.g.cs
+
+# Dotnet
+project.lock.json
+*.dbmdl
+
+# Logs
+*.log
+
+# User secrets
+secrets.json
+appsettings*.Local.json
+
+# Ignore published output
+publish/
+dist/
+
+# OS files
+Thumbs.db
+.DS_Store
+ehthumbs.db
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# Optional: ignore your local test data / temp
+/tmp
+*.tmp
