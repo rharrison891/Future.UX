@@ -270,12 +270,17 @@ using Future.UX.MVVM;
                 if (model != null && typeSymbol != null)
                 {
                     var nodes = cp.DescendantNodes();
-                    foreach (var id in nodes.OfType<IdentifierNameSyntax>())
+                    foreach (var node in cp.DescendantNodesAndTokens())
                     {
-                        var sym = model.GetSymbolInfo(id).Symbol;
-                        if (sym is IPropertySymbol psym &&
-                            SymbolEqualityComparer.Default.Equals(psym.ContainingType, typeSymbol))
-                            deps.Add(psym.Name);
+                        if (node.IsNode && node.AsNode() is IdentifierNameSyntax id)
+                        {
+                            var sym = model.GetSymbolInfo(id).Symbol;
+                            if (sym is IPropertySymbol psym &&
+                                SymbolEqualityComparer.Default.Equals(psym.ContainingType, typeSymbol))
+                            {
+                                deps.Add(psym.Name);
+                            }
+                        }
                     }
 
                     foreach (var ma in nodes.OfType<MemberAccessExpressionSyntax>())

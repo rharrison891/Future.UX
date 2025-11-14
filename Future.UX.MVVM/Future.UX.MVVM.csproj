@@ -6,4 +6,20 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+		<PackageId>Future.UX.MVVM</PackageId>
+		<Version>0.1.0</Version>
+		<Authors>Rich</Authors>
+		<Company>Future.UX</Company>
+		<Description>Lightweight MVVM helpers for WPF: RelayCommand, AsyncRelayCommand.</Description>
+		<PackageTags>mvvm wpf relaycommand async commands</PackageTags>
+
+		<RepositoryUrl>https://github.com/YourUserName/Future.UX</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	</PropertyGroup>
+	
 </Project>
