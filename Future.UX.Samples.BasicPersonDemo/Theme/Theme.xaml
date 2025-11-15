@@ -1,0 +1,15 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Color x:Key="UX.Background.Color">#202020</Color>
+    <Color x:Key="UX.Foreground.Color">#C6C6C6</Color>
+    <Color x:Key="UX.WindowTitleBar.Color">#80808080</Color>
+
+    <SolidColorBrush x:Key="UX.Background.Brush"
+                     Color="{StaticResource UX.Background.Color}" />
+    <SolidColorBrush x:Key="UX.Foreground.Brush"
+                     Color="{StaticResource UX.Foreground.Color}" />
+    <SolidColorBrush x:Key="UX.WindowTitleBar.Brush"
+                     Color="{StaticResource UX.WindowTitleBar.Color}" />
+
+</ResourceDictionary>

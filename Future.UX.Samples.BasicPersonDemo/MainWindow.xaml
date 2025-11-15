@@ -4,51 +4,131 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Basic Person Demo"
-        SizeToContent="WidthAndHeight"
-        Background="#202020"
-        TextElement.Foreground="White"
-        TextElement.FontSize="20"
-        DataContext="{Binding Person ,RelativeSource={RelativeSource Mode=Self}}">
+        Title="{Binding WindowViewModel.Title}"
+        Width="800"
+        Height="600"
+        Style="{StaticResource WindowStyle}"
+        x:Name="WindowRoot"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
 
-    <Border CornerRadius="5"
-            BorderBrush="White"
-            BorderThickness="1"
-            Margin="10">
-        <StackPanel HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-            <Border CornerRadius="5,5,0,0"
-                    Background="#80505050"
-                    Padding="10,5"
-                    Margin="0,0,0,10">
-                <TextBlock Text="{Binding FullName}" />
+    <Grid Background="{StaticResource UX.Background.Brush}">
+        <StackPanel HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Margin="0,-32,0,0"
+                    WindowChrome.IsHitTestVisibleInChrome="True"
+                    Orientation="Horizontal">
+
+            <Border CornerRadius="3"
+                    Margin="0,5,5,5"
+                    VerticalAlignment="Center"
+                    Background="Transparent">
+                <Button FontFamily="Segoe MDL2 Assets"
+                        FontSize="18"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="3"
+                        Foreground="{StaticResource UX.Foreground.Brush}"
+                        Content="&#xE921;"
+                        Command="{Binding WindowViewModel.MinimizeCommand}"
+                        CommandParameter="{Binding ElementName=WindowRoot}" />
             </Border>
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="First Name"
-                           Padding="5"
-                           VerticalAlignment="Center" />
-                <TextBox Width="200"
-                         Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}"
-                         Background="#80505050"
-                         BorderThickness="0"
-                         Padding="5,2"
-                         Margin="5"
-                         Foreground="White" />
-                <TextBlock Text="Last Name"
-                           VerticalAlignment="Center"
-                           Padding="5" />
-                <TextBox Width="200"
-                         Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}"
-                         Background="#80505050"
-                         BorderThickness="0"
-                         Padding="5,2"
-                         Margin="5"
-                         Foreground="White" />
-            </StackPanel>
-            <Button Content="{Binding ClickCountText}"
-                    Command="{Binding ClickIncrementerCommand}"
-                    CommandParameter="1"
-                    Margin="5,20,5,5" />
+            <Border CornerRadius="3"
+                    Margin="0,5,5,5"
+                    VerticalAlignment="Center"
+                    Background="Transparent">
+                <Button FontFamily="Segoe MDL2 Assets"
+                        FontSize="18"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="3"
+                        Foreground="{StaticResource UX.Foreground.Brush}"
+                        Content="&#xE922;"
+                        Command="{Binding WindowViewModel.ToggleMaxCommand}"
+                        CommandParameter="{Binding ElementName=WindowRoot}" />
+            </Border>
+            <Border CornerRadius="3"
+                    Margin="0,5,5,5"
+                    VerticalAlignment="Center"
+                    Background="Red">
+                <Button FontFamily="Segoe MDL2 Assets"
+                        FontSize="18"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="3"
+                        Foreground="{StaticResource UX.Foreground.Brush}"
+                        Content="&#xE8BB;"
+                        Command="{Binding WindowViewModel.CloseCommand}" />
+            </Border>
         </StackPanel>
-    </Border>
+        <Grid Margin="5">
+            <TabControl Background="{StaticResource UX.Background.Brush}">
+                <TabItem Header="Property Bindings"
+                         DataContext="{Binding Person}">
+                    <Grid>
+                        <UniformGrid Columns="2"
+                                     Margin="5"
+                                     HorizontalAlignment="Left"
+                                     VerticalAlignment="Top"
+                                     Width="240"
+                                     TextElement.Foreground="{StaticResource UX.Foreground.Brush}">
+                            <TextBlock Text="Title" />
+                            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="First Name" />
+                            <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="Last Name" />
+                            <TextBox Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="Address" />
+                            <TextBox Text="{Binding Add1, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock />
+                            <TextBox Text="{Binding Add2, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock />
+                            <TextBox Text="{Binding Add3, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock />
+                            <TextBox Text="{Binding Add4, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="Postcode" />
+                            <TextBox Text="{Binding Postcode, UpdateSourceTrigger=PropertyChanged}" />
+                        </UniformGrid>
+                        <Grid Background="White"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Stretch"
+                              Width="400">
+                            <StackPanel Margin="15">
+                                <TextBlock HorizontalAlignment="Right"
+                                           Text="Future.UX" />
+                                <TextBlock HorizontalAlignment="Right"
+                                           Text="Future Towers" />
+                                <TextBlock HorizontalAlignment="Right"
+                                           Text="London" />
+                                <TextBlock HorizontalAlignment="Right"
+                                           Text="SC1 1AA" />
+                                <TextBlock HorizontalAlignment="Left"
+                                           Text="{Binding ShortName}" />
+                                <TextBlock HorizontalAlignment="Left"
+                                           Text="{Binding AddressBlock}" />
+                                <TextBlock />
+                                <TextBlock Text="{Binding Greeting}" />
+                                <TextBlock />
+                                <TextBlock TextWrapping="Wrap"
+                                           Margin="0,10,0,0"
+                                           TextAlignment="Justify"
+                                           Text="Thank you for taking a look at our Future.UX Github." />
+                                <TextBlock TextWrapping="Wrap"
+                                           Margin="0,10,0,0"
+                                           TextAlignment="Justify"
+                                           Text="Change the data on the left to see realtime updates using miminal code. No need for Usings, Properties, or Attributes." />
+                                <TextBlock TextWrapping="Wrap"
+                                           Margin="0,10,0,0"
+                                           TextAlignment="Justify"
+                                           Text="All you need to do is use the private __field naming convention and we take care of the rest." />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Command Bindings"
+                         DataContext="{Binding Person}">
+
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </Grid>
 </Window>

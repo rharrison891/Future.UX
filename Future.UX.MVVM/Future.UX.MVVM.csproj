@@ -11,14 +11,14 @@
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
 		<PackageId>Future.UX.MVVM</PackageId>
-		<Version>0.1.0</Version>
+		<Version>0.1.1</Version>
 		<Authors>Rich</Authors>
 		<Company>Future.UX</Company>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<Description>Lightweight MVVM helpers for WPF: RelayCommand, AsyncRelayCommand.</Description>
 		<PackageTags>mvvm wpf relaycommand async commands</PackageTags>
 
-		<RepositoryUrl>https://github.com/YourUserName/Future.UX</RepositoryUrl>
+		<RepositoryUrl>https://github.com/rharrison891/Future.UX</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>

@@ -4,6 +4,11 @@
              xmlns:local="clr-namespace:Future.UX.Samples.BasicPersonDemo"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Theme/Theme.xaml" />
+                <ResourceDictionary Source="/Controls/WindowChrome.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -1,19 +1,23 @@
-﻿namespace Future.UX.Samples.BasicPersonDemo
+﻿using System.Windows;
+
+namespace Future.UX.Samples.BasicPersonDemo
 {
     public partial class Person
     {
         //Simple setup for fields
+        private string? __title;
         private string? __firstName;
         private string? __lastName;
-        private bool __buttonEnabled = true;
-        private int __clickCount;
-
-        //Commands
-        private void __ClickIncrementer(object parameter) => ClickCount += Convert.ToInt32(parameter);
-        private bool __ClickIncrementer_Can(object parameter) => ButtonEnabled;
-
+        private string? __add1;
+        private string? __add2;
+        private string? __add3;
+        private string? __add4;
+        private string? __postcode;
+        
         //Auto notifying computed properties
-        public string FullName => $"{FirstName} {LastName}";
-        public string ClickCountText => $"Clicked {ClickCount} times";
+        public string FullName => $"{Title} {FirstName} {LastName}";
+        public string ShortName => $"{Title} {FirstName.ToArray().First()} {LastName}";
+        public string Greeting => $"Dear {Title} {LastName},";
+        public string AddressBlock=> $"{Add1}, \n{Add2}, \n{Add3}, \n{Add4}, \n{Postcode.ToUpper()}";
     }
 }

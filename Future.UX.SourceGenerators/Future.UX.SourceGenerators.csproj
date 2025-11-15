@@ -10,7 +10,7 @@
 		<Description>Source generator for bindable properties and commands using __ fields and methods.</Description>
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<IncludeSymbols>false</IncludeSymbols>
-		<Version>1.0.0.1</Version>
+		<Version>1.0.0.3</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

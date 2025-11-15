@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="Future.UX.FluentIcons/Future.UX.FluentIcons.csproj" Id="fda36b17-8e5d-48af-9f94-abfabf107e5a" />
   <Project Path="Future.UX.MVVM/Future.UX.MVVM.csproj" />
   <Project Path="Future.UX.Samples.BasicPersonDemo/Future.UX.Samples.BasicPersonDemo.csproj" Id="dcdd3137-dd2a-4b3d-be65-4d39baa2226b" />
   <Project Path="Future.UX.SourceGenerators.TEST/Future.UX.SourceGenerators.TEST.csproj" />
