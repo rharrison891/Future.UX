@@ -9,7 +9,7 @@ namespace Future.UX.WPF.Theme
 {
     public static partial class Theme
     {
-        private static Dictionary<string, Color> __baseColors = new() {
+        private static readonly Dictionary<string, Color> __baseColors = new() {
             { "Background",Color.FromArgb(255,30,30,30)  },
             { "Foreground", Color.FromArgb(255,220,220,220) },
             { "Primary", Color.FromArgb(255,0,120,215) },
@@ -20,5 +20,9 @@ namespace Future.UX.WPF.Theme
             { "Warning", Color.FromArgb(255,255,185,0) },
             { "Success", Color.FromArgb(255,16,124,16) }
         };
+
+        private static void Test() { 
+            
+        }
     }
 }
