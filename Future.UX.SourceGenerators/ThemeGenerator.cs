@@ -381,12 +381,14 @@ public class ThemeGenerator : IIncrementalGenerator
         sb.AppendLine("            AsColor ? (object)Theme.GetBrush(Base, Alpha, Brightness).Color");
         sb.AppendLine("            : Theme.GetBrush(Base, Alpha, Brightness);");
         sb.AppendLine("");
-        sb.AppendLine("       public BrushBaseExtension(ThemeColor baseColor, double alpha=1, double brightness=0, bool asColor=false)");
+        sb.AppendLine("       public BrushBaseExtension() : this(ThemeColor.Primary, 0, 0, false) { }");
+        sb.AppendLine("");
+        sb.AppendLine("       public BrushBaseExtension(ThemeColor baseColor, double alpha = 1, double brightness = 0, bool asColor = false)");
         sb.AppendLine("       {");   
         sb.AppendLine("            Base = baseColor;");
-        sb.AppendLine("            Alpha =alpha;");
-        sb.AppendLine("            Brightness =brightness;");
-        sb.AppendLine("            AsColor =asColor;");
+        sb.AppendLine("            Alpha = alpha;");
+        sb.AppendLine("            Brightness = brightness;");
+        sb.AppendLine("            AsColor = asColor;");
         sb.AppendLine("       }");
         sb.AppendLine("");
         foreach (var c in colors)
