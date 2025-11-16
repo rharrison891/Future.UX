@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /Future.UX.MVVM/README.md
 /Future.UX.SourceGenerators/README.md
+/Future.UX.WPF/Future.UX.WPF.csproj

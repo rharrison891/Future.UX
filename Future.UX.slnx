@@ -4,4 +4,5 @@
   <Project Path="Future.UX.Samples.BasicPersonDemo/Future.UX.Samples.BasicPersonDemo.csproj" Id="dcdd3137-dd2a-4b3d-be65-4d39baa2226b" />
   <Project Path="Future.UX.SourceGenerators.TEST/Future.UX.SourceGenerators.TEST.csproj" />
   <Project Path="Future.UX.SourceGenerators/Future.UX.SourceGenerators.csproj" />
+  <Project Path="Future.UX.WPF/Future.UX.WPF.csproj" Id="9a88a3d3-9f4e-46a8-907f-f8a4b67c6d0f" />
 </Solution>

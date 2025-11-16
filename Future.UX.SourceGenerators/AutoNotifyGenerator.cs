@@ -26,6 +26,10 @@ namespace Future.UX.SourceGenerators
                         if (ctx.SemanticModel.GetDeclaredSymbol(variable, ct) is not IFieldSymbol fieldSymbol)
                             return null;
 
+                        // Skip static fields
+                        if (fieldSymbol.IsStatic)
+                            return null;
+
                         var typeName = fieldSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
                             .Replace("global::", string.Empty);
 
