@@ -1,4 +1,4 @@
-﻿# Future.UX
+# Future.UX
 
 **Experimental MVVM toolkit + C#14 source generator** for ultra-lightweight, boilerplate-free MVVM in WPF.
 
@@ -108,5 +108,3 @@ Keep main protected; we like it stable. 😎
 License
 
 MIT – see the LICENSE file.
-
-This one is complete and should copy all the way down. 
