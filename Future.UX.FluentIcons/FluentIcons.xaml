@@ -3,7 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!-- Fluent Icons FontFamily -->
-    <FontFamily x:Key="SegoeFluent">pack://application:,,,/Assets/SegoeFluent.ttf#Segoe Fluent Icons</FontFamily>
+    <FontFamily x:Key="SegoeFluent">/Future.UX.FluentIcons;component/Assets/SegoeFluent.ttf#Segoe</FontFamily>
 
     <sys:String x:Key="Icon.GlobalNavButton">&#xe700;</sys:String>
     <sys:String x:Key="Icon.Wifi">&#xe701;</sys:String>

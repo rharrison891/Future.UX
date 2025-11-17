@@ -2,31 +2,17 @@
 
 	<PropertyGroup>
 		<TargetFramework>net8.0-windows</TargetFramework>
-		<UseWPF>true</UseWPF>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<PackageId>Future.UX.FluentIcons</PackageId>
-		<Version>0.1.0</Version>
-		<Authors>Rich</Authors>
-		<Company>Future.UX</Company>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<Description>WPF wrapper for Segoe Fluent Icons</Description>
-		<PackageTags>Enum,Dictionary,Converter,XAML,Icons</PackageTags>
-		<RepositoryUrl>https://github.com/rharrison891/Future.UX</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-
-		<!-- Ensure output DLL is included -->
-		<IncludeBuildOutput>true</IncludeBuildOutput>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="README.md" Pack="true" PackagePath="\"/>
+		<!-- Embed the font so WPF can find it -->
 		<Resource Include="Assets\SegoeFluent.ttf" Pack="true" PackagePath="Assets\" />
+
+		<!-- Embed the XAML for icons -->
+		<Resource Include="FluentIcons.xaml" Pack="true" PackagePath="Assets\" />
 	</ItemGroup>
-	<ItemGroup>
-		<None Include="FluentIcons.xaml" Pack="true" PackagePath="Assets\" />
-	</ItemGroup>
+
 </Project>
