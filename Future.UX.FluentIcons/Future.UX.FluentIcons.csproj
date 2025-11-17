@@ -1,18 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net8.0-windows</TargetFramework>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+	  <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>Future.UX.FluentIcons</PackageId>
+    <Version>0.1.7</Version>
+    <Authors>Rich</Authors>
+    <Company>Future.UX</Company>
+    <Description>A collection of Fluent Icons for use in .NET applications.</Description>
+    <PackageTags>Fluent Icons Pack .NET</PackageTags>
 
-	<ItemGroup>
-		<!-- Embed the font so WPF can find it -->
-		<Resource Include="Assets\SegoeFluent.ttf" Pack="true" PackagePath="Assets\" />
+    <RepositoryUrl>https://github.com/rharrison891/Future.UX</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
 
-		<!-- Embed the XAML for icons -->
-		<Resource Include="FluentIcons.xaml" Pack="true" PackagePath="Assets\" />
-	</ItemGroup>
+  <ItemGroup>
+    <!-- Embed the font inside the DLL as a WPF resource -->
+    <Resource Include="Assets\SegoeFluent.ttf" />
+
+    <!-- Embed the XAML dictionary -->
+    <Resource Include="FluentIcons.xaml" />
+  </ItemGroup>
 
 </Project>

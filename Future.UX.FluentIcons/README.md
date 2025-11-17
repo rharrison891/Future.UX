@@ -17,3 +17,4 @@ You can install the Future.UX.FluentIcons package via NuGet Package Manager:
 Or via the .NET CLI:
 
 ```dotnet add package Future.UX.FluentIcons```
+
