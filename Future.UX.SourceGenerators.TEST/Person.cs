@@ -1,4 +1,5 @@
 ﻿
+using Future.UX.Fonts;
 using System.Diagnostics;
 
 namespace Future.UX.SourceGenerators.TEST
@@ -15,7 +16,8 @@ namespace Future.UX.SourceGenerators.TEST
 
         // Command method
         // The generated code will create a public RelayCommand property named PlayCommand
-        private void __Play() {
+        private void __Play()
+        {
             Console.WriteLine($"Running execution code with parameter [NONE]");
         }
         // CanExecute method for the command
@@ -50,7 +52,7 @@ namespace Future.UX.SourceGenerators.TEST
         }
 
         // Computed property (depends on field-backed properties)
-        public string Fullname => $"{Title??""} {FirstName??""} {LastName ?? ""} [{Email ?? ""}] [{Phone ?? ""}] {Environment.NewLine}{Address ?? ""}";
+        public string Fullname => $"{Title ?? ""} {FirstName ?? ""} {LastName ?? ""} [{Email ?? ""}] [{Phone ?? ""}] {Environment.NewLine}{Address ?? ""}";
 
         // Computed property that depends on another computed property
         public string Greeting => $"Hello, {Fullname ?? ""}";

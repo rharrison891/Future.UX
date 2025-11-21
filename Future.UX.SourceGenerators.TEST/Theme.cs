@@ -1,4 +1,5 @@
-﻿using System.Windows.Media;
+﻿using Future.UX.Fonts;
+using System.Windows.Media;
 
 //Any namespace will work here, as the Source Generator will place the generated code in the same namespace
 namespace Future.UX.WPF.Theme
@@ -42,6 +43,7 @@ namespace Future.UX.WPF.Theme
         //Generated members can now be used throughout the application
         private static void Test()
         {
+            
             //Get the color or brush for a theme color
             var brush = Theme.GetBrush(ThemeColor.Primary);
             var color = Theme.GetColor(ThemeColor.Accent);

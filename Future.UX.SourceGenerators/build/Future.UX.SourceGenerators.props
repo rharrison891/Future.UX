@@ -1,0 +1,8 @@
+﻿<Project>
+	<!-- Automatically include all TTF fonts in the consumer project -->
+	<ItemGroup>
+		<AdditionalFiles Include="Fonts\**\*.ttf" />
+		<Resource Include="Fonts\**\*.ttf" />
+	</ItemGroup>
+	
+</Project>

@@ -98,6 +98,33 @@ Brush Extension allows inline tweaks to existing brushes (e.g., change opacity, 
     </TextBlock>
 ```
 
+# Font Generator
+
+Auto generates FontFamily resources with enums and FontFamilyExtension for easy use in XAML.
+
+Add a Fonts folder to your project and add font files there. The generator will pick them up automatically.
+
+Example structure:
+
+YourProject
+
+```
+├── Fonts   
+│   ├── SegoeFluent
+│   │   ├── SegoeFluent-Regular.ttf
+│   │   ├── SegoeFluent-Semibold.ttf
+│   │   └── SegoeFluent-Bold.ttf
+│   └── AnotherFont
+
+```
+
+```xaml
+
+<TextBlock FontFamily="{t:FontFamily Font=SegoeFluent, Weight=Semibold}" 
+           FontSize="24" 
+           Text="Hello, Future.UX!" />
+```
+
 Contributing
 
 Open a PR against the dev branch.

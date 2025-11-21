@@ -7,8 +7,9 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
+
 	<ItemGroup>
-	  <ProjectReference Include="..\Future.UX.MVVM\Future.UX.MVVM.csproj" />
+		<ProjectReference Include="..\Future.UX.MVVM\Future.UX.MVVM.csproj" />
 		<ProjectReference Include="..\Future.UX.SourceGenerators\Future.UX.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
