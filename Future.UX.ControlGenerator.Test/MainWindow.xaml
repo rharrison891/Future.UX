@@ -1,0 +1,31 @@
+﻿<Window x:Class="Future.UX.ControlGenerator.Test.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Future.UX.ControlGenerator.Test"
+        mc:Ignorable="d"
+        xmlns:controls="clr-namespace:Future.UX.ControlGenerator.Test.Controls"
+        Title="MainWindow"
+        Height="450"
+        Width="800"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+    <Grid>
+        <StackPanel>
+            <controls:IconButton Icon="Globe"
+                                 CornerRadius="5"
+                                 FontSize="24"
+                                 HorizontalAlignment="Center"
+                                 BorderBrush="Black"
+                                 BorderThickness="1" 
+                                 Padding="5"
+                                 IconColor="Red"
+                                 Foreground="Blue"/>
+            <controls:LabelledTextBox Label="Enter your name:"
+                                      Orientation="Vertical"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+            <controls:Test Text="Hello" />
+        </StackPanel>
+    </Grid>
+</Window>

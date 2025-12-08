@@ -27,7 +27,7 @@ namespace Future.UX.SourceGenerators
                             return null;
 
                         // Skip static fields
-                        if (fieldSymbol.IsStatic)
+                        if (fieldSymbol.IsStatic || fieldSymbol.IsReadOnly)
                             return null;
 
                         var typeName = fieldSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
@@ -57,6 +57,7 @@ namespace Future.UX.SourceGenerators
                 {
                     var classSyntax = group.Key;
                     var className = classSyntax.Identifier.Text;
+
                     var namespaceName = GetNamespace(classSyntax);
 
                     SemanticModel? model = null;

@@ -5,6 +5,9 @@
 - `Future.UX.SourceGenerators` – Incremental source generator: converts `__`-prefixed fields and methods into **bindable properties** and **commands** automatically.
 - `Future.UX.MVVM` – Runtime MVVM helpers (`RelayCommand` / `AsyncRelayCommand`) to handle sync and async commands cleanly.
 - `Future.UX.Test` – Playground & sample projects to try things out.
+- `Future.UX.Theming` – Theme generator and Brush extension for dynamic resource generation and inline brush modifications.
+- `Future.UX.Fonts` – Font generator and FontFamily extension for easy font resource management.(Currently not working... coming soon!)
+
 
 ## Quick Start
 
@@ -31,8 +34,66 @@ Minimal boilerplate – just define your fields & methods, the generator does th
 
 Fully compatible with XAML bindings and CommandParameter.
 
-**NEW**
-Theme generator: auto-generate application wide resources for colors, brushes, and styles from a single Dictionary.
+## Control Generator 
+For auto-generating custom controls with bindable properties. Create a partial class and a resource dictionary for the control template.
+The generator wires up the dependency properties and template parts automatically.
+
+## Example
+Resource dictionary for the control template.
+```xaml
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Future.UX.ControlGenerator.Test.Controls">
+
+    <Style TargetType="controls:LabelledTextBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:LabelledTextBox">
+                    <StackPanel Orientation="{TemplateBinding Orientation}">
+                        <TextBlock Text="{TemplateBinding Label}"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,5" />
+                        <TextBox x:Name="PART_Text" Text="{Binding Path=TextProperty, RelativeSource={RelativeSource Mode=TemplatedParent}}"
+                                 Width="200"
+                                 Height="25" />
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
+```
+
+User code:
+```csharp
+public partial class LabelledTextBox : Control
+    {
+        partial void TextPropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        partial void OrientationChanged(DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        partial void LabelChanged(DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        partial void OnTemplateApplied()
+        {
+            PART_Text.TextChanged+=(s, e) =>
+            {
+                throw new NotImplementedException();
+            };
+        }
+    }
+```
+
+
+## Theme generator
+Auto-generates application wide resources for colors, brushes, and styles from a single Dictionary.
 Brush Extension allows inline tweaks to existing brushes (e.g., change opacity, or brightness).
 ## Example
 ```csharp	
@@ -48,6 +109,7 @@ Brush Extension allows inline tweaks to existing brushes (e.g., change opacity, 
         { "Success", Color.FromArgb(255,16,124,16) }
     };
 
+    //Example usage of BrushBaseExtension in code-behind
     private static void Generated() { 
         var brush = Theme.GetBrush(ThemeColor.Primary);
         var color= Theme.GetColor(ThemeColor.Accent);
@@ -58,6 +120,7 @@ Brush Extension allows inline tweaks to existing brushes (e.g., change opacity, 
     } 
 ```
 ```xaml
+    <!--Example usage of BrushBaseExtension in XAML-->
     <TextBlock HorizontalAlignment="Center"
                VerticalAlignment="Center"
                FontSize="30"

@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Future.UX.FluentIcons</PackageId>
-    <Version>0.1.7</Version>
+    <Version>0.1.8</Version>
     <Authors>Rich</Authors>
     <Company>Future.UX</Company>
     <Description>A collection of Fluent Icons for use in .NET applications.</Description>

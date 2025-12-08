@@ -1,0 +1,27 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Future.UX.ControlGenerator.Test.Controls">
+
+    <Style TargetType="controls:IconButton">
+        <Setter Property="Template">
+            <Setter.Value>
+
+                <ControlTemplate TargetType="controls:IconButton">
+                    <Border BorderBrush="{TemplateBinding BorderBrush}"
+                            Background="{TemplateBinding Background}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Cursor="Hand"
+                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="{TemplateBinding Glyph}"
+                                   Foreground="{TemplateBinding IconColor}"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   FontSize="{TemplateBinding FontSize}"
+                                   />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

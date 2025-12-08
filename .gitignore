@@ -364,3 +364,7 @@ FodyWeavers.xsd
 /Future.UX.MVVM/README.md
 /Future.UX.SourceGenerators/README.md
 /Future.UX.WPF/Future.UX.WPF.csproj
+/Authoring.Test
+/Future.UX.HTML
+/Future.UX.WPF
+/Future.UX.ControlGenerator

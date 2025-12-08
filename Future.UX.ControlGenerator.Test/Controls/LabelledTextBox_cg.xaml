@@ -1,0 +1,22 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Future.UX.ControlGenerator.Test.Controls">
+
+    <Style TargetType="controls:LabelledTextBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:LabelledTextBox">
+                    <StackPanel Orientation="{TemplateBinding Orientation}">
+                        <TextBlock Text="{TemplateBinding Label}"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,5" />
+                        <TextBox x:Name="PART_Text" Text="{Binding TextProperty, RelativeSource={RelativeSource Mode=TemplatedParent}}"
+                                 Width="200"
+                                 Height="25" />
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

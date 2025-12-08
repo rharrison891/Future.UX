@@ -1,5 +1,4 @@
-﻿using Future.UX.Fonts;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 
 //Any namespace will work here, as the Source Generator will place the generated code in the same namespace
 namespace Future.UX.WPF.Theme

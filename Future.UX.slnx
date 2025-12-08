@@ -1,7 +1,14 @@
 <Solution>
+  <Project Path="../Future.UX.Authoring/Future.UX.Authoring.csproj" />
+  <Project Path="Authoring.Test/Authoring.Test.csproj" Id="5f620f5a-bed2-41bb-88fd-56644d289f44" />
+  <Project Path="Future.UX.ControlGenerator.Test/Future.UX.ControlGenerator.Test.csproj" />
+  <Project Path="Future.UX.ControlGenerator/Future.UX.ControlGenerator.csproj" Id="97b69409-9e07-4b33-95be-b11e56d12b12" />
   <Project Path="Future.UX.FluentIcons/Future.UX.FluentIcons.csproj" Id="fda36b17-8e5d-48af-9f94-abfabf107e5a" />
+  <Project Path="Future.UX.HTML/Future.UX.HTML.csproj" Id="1148ce64-075c-4ac8-976c-8c9b69d0b20c" />
+  <Project Path="Future.UX.JSONPropertyCreator/Future.UX.JSONPropertyCreator.csproj" Id="6bb14844-1a46-408f-84db-e850c7f504fc" />
   <Project Path="Future.UX.MVVM/Future.UX.MVVM.csproj" />
   <Project Path="Future.UX.Samples.BasicPersonDemo/Future.UX.Samples.BasicPersonDemo.csproj" Id="dcdd3137-dd2a-4b3d-be65-4d39baa2226b" />
   <Project Path="Future.UX.SourceGenerators.TEST/Future.UX.SourceGenerators.TEST.csproj" />
   <Project Path="Future.UX.SourceGenerators/Future.UX.SourceGenerators.csproj" />
+  <Project Path="Future.UX.WPF/Future.UX.WPF.csproj" Id="ea9bcbf1-1ddf-4d6d-9895-97418a2faedd" />
 </Solution>

@@ -1,22 +1,19 @@
 ﻿using System.Globalization;
 using System.Windows.Data;
 
-namespace Future.UX.FluentIcons
+public class FluentConverter : IValueConverter
 {
-    public class FluentConverter : IValueConverter
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is FluentIcons.Icons icon && FluentIconMap.IconMap.TryGetValue(icon, out var glyph))
-                return glyph;
+        if (value is Icons icon && FluentMap.IconMap.TryGetValue(icon, out var glyph))
+            return glyph;
 
-            // fallback if value isn't in the map
-            return string.Empty;
-        }
+        // fallback if value isn't in the map
+        return string.Empty;
+    }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotSupportedException();
-        }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
     }
 }
