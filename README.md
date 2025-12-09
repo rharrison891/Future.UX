@@ -1,4 +1,4 @@
-![Release](https://img.shields.io/badge/release-v1.0.0.2-blue)
+![Release](https://img.shields.io/badge/release-v1.0.2-blue)
 ![NuGet](https://img.shields.io/nuget/v/Future.UX.SourceGenerators)
 ![NuGet](https://img.shields.io/nuget/v/Future.UX.MVVM)
 
